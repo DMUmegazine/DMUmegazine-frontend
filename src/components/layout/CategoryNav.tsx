@@ -1,30 +1,34 @@
+// src/components/layout/CategoryNav.tsx
 import React from 'react';
-import { Plus } from 'lucide-react';
 
 interface CategoryNavProps {
   tags: string[];
-  activeTag: string;
-  onTagChange: (tag: string) => void;
+  activeTags: string[];
+  onTagToggle: (tag: string) => void;
+  onAddClick: () => void; // 추가
 }
 
-export default function CategoryNav({ tags, activeTag, onTagChange }: CategoryNavProps) {
+export default function CategoryNav({ tags, activeTags, onTagToggle, onAddClick }: CategoryNavProps) {
   return (
-    <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
-      {tags.map((tag) => (
+    <div className="flex gap-2 items-center">
+      {tags.map(tag => (
         <button
           key={tag}
-          onClick={() => onTagChange(tag)}
-          className={`px-5 py-2 rounded-full text-xs font-bold transition-all border whitespace-nowrap ${
-            activeTag === tag 
-            ? 'bg-[#1E293B] border-[#34D399] text-[#34D399]' 
-            : 'bg-transparent border-[#2A2A2A] text-gray-500 hover:border-gray-600'
+          onClick={() => onTagToggle(tag)}
+          className={`px-4 py-1.5 rounded-full text-xs font-bold border transition-all ${
+            activeTags.includes(tag) 
+            ? 'bg-white text-black border-white' 
+            : 'bg-transparent border-border text-gray-400'
           }`}
         >
           {tag}
         </button>
       ))}
-      <button className="p-2 border border-dashed border-[#2A2A2A] rounded-full text-gray-600 flex-shrink-0">
-        <Plus size={16} />
+      <button 
+        onClick={onAddClick} // 이벤트 연결 [cite: 1]
+        className="px-3 py-1.5 border border-dashed border-border rounded-full text-gray-500 hover:text-white transition-colors text-xs font-bold"
+      >
+        + 태그 추가
       </button>
     </div>
   );
