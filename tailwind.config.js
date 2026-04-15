@@ -8,7 +8,7 @@ module.exports = {
       colors: {
         background: "#121212",
         card: "#1E1E1E",
-        accent: "#34D399", // 시안의 초록색
+        accent: "#34D399",
         border: "#2A2A2A",
       },
     },
