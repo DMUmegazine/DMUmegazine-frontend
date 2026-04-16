@@ -3,7 +3,8 @@ import CategoryNav from '../components/layout/CategoryNav';
 import DeepSearchBar from '../components/main/DeepSearchBar';
 import MagazineGrid from '../components/main/MagazineGrid';
 import KeywordModal from '../components/main/KeywordModal';
-import { NewsArticle } from '../types/magazine'; 
+import { NewsArticle } from '../types/magazine';
+import SignUp from '../components/main/SignUp';
 
 const DUMMY_ARTICLES: NewsArticle[] = [
   {
@@ -40,6 +41,7 @@ export default function MainPage() {
   const [selectedTags, setSelectedTags] = useState<string[]>(['IT']);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedNews, setSelectedNews] = useState<NewsArticle | null>(null);
+  const [showSignUp, setShowSignUp] = useState(false);
 
   const handleAddTag = (newTag: string) => {
     if (!allTags.includes(newTag)) {
@@ -50,27 +52,42 @@ export default function MainPage() {
     }
     setIsModalOpen(false); // 모달 닫기
   };
-  
-const toggleTag = (tag: string) => {
-    setSelectedTags(prev => 
+
+  const toggleTag = (tag: string) => {
+    setSelectedTags(prev =>
       prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
     );
   };
 
+  // SignUpPage로 전환
+  if (showSignUp) {
+    return <SignUp onBack={() => setShowSignUp(false)} />;
+  }
   return (
+
     <div className="min-h-screen bg-background p-6 lg:p-10">
       <div className="max-w-5xl mx-auto">
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
           <h1 className="text-2xl font-black italic text-white uppercase tracking-tighter">
-            MEGA<span className="text-accent">ZINE</span>
+            <span className="text-accent">ME</span>GAZINE
           </h1>
-          <CategoryNav 
-            tags={allTags} // 전체 태그 전달
-            activeTags={selectedTags} 
-            onTagToggle={toggleTag}
-            onAddClick={() => setIsModalOpen(true)} // + 버튼 클릭 이벤트 [cite: 1]
-          />
+          <div className="flex items-center gap-4">
+            <CategoryNav
+              tags={allTags}
+              activeTags={selectedTags}
+              onTagToggle={toggleTag}
+              onAddClick={() => setIsModalOpen(true)}
+            />
+            {/* 회원가입 버튼 */}
+            <button
+              onClick={() => setShowSignUp(true)}
+              className="bg-[#34D399] text-black text-xs font-black tracking-widest px-4 py-2 rounded-xl hover:bg-white transition-colors duration-150 uppercase"
+            >
+              회원가입
+            </button>
+          </div>
         </header>
+
 
         {/* 2. [DEEP-01] 검색바 (상단 고정) */}
         <DeepSearchBar onSearch={(k) => console.log(k)} />
@@ -97,16 +114,16 @@ const toggleTag = (tag: string) => {
             <h2 className="text-sm text-gray-500 font-bold mb-1 italic">나의 매거진 — {selectedTags.join(', ')}</h2>
             <p className="text-[11px] text-gray-600 italic">● 벡터DB 기반 실시간 AI 매거진입니다</p>
           </div>
-          
-          <MagazineGrid 
-            articles={DUMMY_ARTICLES.filter(a => selectedTags.includes(a.tag))} 
-            onNewsClick={setSelectedNews} 
+
+          <MagazineGrid
+            articles={DUMMY_ARTICLES.filter(a => selectedTags.includes(a.tag))}
+            onNewsClick={setSelectedNews}
           />
         </section>
         {isModalOpen && (
-          <KeywordModal 
-            onClose={() => setIsModalOpen(false)} 
-            onSelect={handleAddTag} 
+          <KeywordModal
+            onClose={() => setIsModalOpen(false)}
+            onSelect={handleAddTag}
           />
         )}
       </div>
