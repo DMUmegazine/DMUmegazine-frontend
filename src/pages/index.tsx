@@ -5,6 +5,7 @@ import MagazineGrid from '../components/main/MagazineGrid';
 import KeywordModal from '../components/main/KeywordModal';
 import { NewsArticle } from '../types/magazine';
 import SignUp from '../components/main/SignUp';
+import Login from '../components/main/Login';
 
 const DUMMY_ARTICLES: NewsArticle[] = [
   {
@@ -42,6 +43,7 @@ export default function MainPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedNews, setSelectedNews] = useState<NewsArticle | null>(null);
   const [showSignUp, setShowSignUp] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
 
   const handleAddTag = (newTag: string) => {
     if (!allTags.includes(newTag)) {
@@ -59,9 +61,12 @@ export default function MainPage() {
     );
   };
 
-  // SignUpPage로 전환
+  if (showLogin) {
+    return <Login onBack={() => setShowLogin(false)} onSignUp={() => { setShowLogin(false); setShowSignUp(true); }} />;
+  }
+
   if (showSignUp) {
-    return <SignUp onBack={() => setShowSignUp(false)} />;
+    return <SignUp onBack={() => setShowSignUp(false)} onLogin={() => { setShowSignUp(false); setShowLogin(true); }} />;
   }
   return (
 
