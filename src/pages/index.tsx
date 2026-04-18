@@ -81,7 +81,7 @@ export default function MainPage() {
             {/* 회원가입 버튼 */}
             <button
               onClick={() => setShowSignUp(true)}
-              className="bg-[#34D399] text-black text-xs font-black tracking-widest px-4 py-2 rounded-xl hover:bg-white transition-colors duration-150 uppercase"
+              className="bg-[#34D399] text-black text-xs font-bold tracking-widest px-4 py-2 rounded-xl hover:bg-white transition-colors duration-150 uppercase"
             >
               회원가입
             </button>

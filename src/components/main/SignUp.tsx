@@ -137,7 +137,7 @@ export default function SignUpPage({ onBack }: SignUpPageProps) {
         <div className="mb-10">
           <div className="flex items-center gap-3 mb-6">
             <h1 className="text-2xl font-black italic text-white uppercase tracking-tighter">
-              MEGA<span className="text-[#34D399]">ZINE</span>
+              <span className="text-[#34D399]">ME</span>GAZINE
             </h1>
             <span className="bg-[#34D399]/10 border border-[#34D399]/20 text-[#34D399] text-[9px] px-2 py-1 rounded font-black tracking-widest">
               SIGN UP
