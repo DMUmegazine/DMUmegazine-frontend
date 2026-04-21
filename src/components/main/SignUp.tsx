@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 
+// 회원가입 폼 입력 데이터 구조
 interface FormData {
   email: string;
   username: string;
@@ -8,6 +9,7 @@ interface FormData {
   confirmPassword: string;
 }
 
+// 유효성 검사 에러 메시지 구조
 interface FormErrors {
   email?: string;
   username?: string;
@@ -16,15 +18,14 @@ interface FormErrors {
   confirmPassword?: string;
 }
 
-// props 타입 추가
+// props 타입 추가 (뒤로가기 콜백)
 interface SignUpPageProps {
   onBack?: () => void;
   onLogin?: () => void;
 }
 
-
-
 export default function SignUpPage({ onBack, onLogin }: SignUpPageProps) {
+
   const [formData, setFormData] = useState<FormData>({
     email: '',
     username: '',
@@ -33,10 +34,14 @@ export default function SignUpPage({ onBack, onLogin }: SignUpPageProps) {
     confirmPassword: '',
   });
 
+  // 유효성 검사 에러 메시지 상태
   const [errors, setErrors] = useState<FormErrors>({});
+  // 현재 포커스된 입력 필드 이름 (스타일 하이라이트용)
   const [focusedField, setFocusedField] = useState<string | null>(null);
+  // 회원가입 완료 여부 (완료 화면 전환용)
   const [submitted, setSubmitted] = useState(false);
 
+  // 각 필드의 입력값을 검사하고 에러 메시지 객체를 반환
   const validate = (): FormErrors => {
     const newErrors: FormErrors = {};
     if (!formData.email) {
@@ -65,6 +70,8 @@ export default function SignUpPage({ onBack, onLogin }: SignUpPageProps) {
     return newErrors;
   };
 
+  // ----- 이벤트 핸들러 -----
+  // 입력값 변경 시 formData 업데이트 + 해당 필드 에러 초기화
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -73,6 +80,7 @@ export default function SignUpPage({ onBack, onLogin }: SignUpPageProps) {
     }
   };
 
+  // 제출 버튼 클릭 시 유효성 검사 후 통과하면 완료 상태로 전환
   const handleSubmit = (e: React.MouseEvent) => {
     e.preventDefault();
     const validationErrors = validate();
@@ -83,6 +91,8 @@ export default function SignUpPage({ onBack, onLogin }: SignUpPageProps) {
     setSubmitted(true);
   };
 
+  // ----- 입력 필드 목록 -----
+  // 렌더링할 폼 필드 정보 배열
   const fields: {
     name: keyof FormData;
     label: string;
@@ -97,20 +107,26 @@ export default function SignUpPage({ onBack, onLogin }: SignUpPageProps) {
       { name: 'confirmPassword', label: '비밀번호 확인', type: 'password', placeholder: '한 번 더 입력', tag: 'CFM' },
     ];
 
+  // ----- 완료 화면 -----
+  // 회원가입 성공 시 완료 화면
   if (submitted) {
     return (
       <div className="min-h-screen bg-[#0d0d0d] flex items-center justify-center p-6">
         <div className="max-w-md w-full text-center">
+          {/* 완료 뱃지 */}
           <div className="inline-block bg-[#34D399]/10 border border-[#34D399]/30 rounded-2xl px-4 py-1 mb-6">
             <span className="text-[#34D399] text-xs font-black tracking-widest">● COMPLETE</span>
           </div>
+          {/* 로고 */}
           <h2 className="text-4xl font-black italic text-white uppercase tracking-tighter mb-4">
-            MEGA<span className="text-[#34D399]">ZINE</span>
+            <span className="text-[#34D399]">ME</span>GAZINE
           </h2>
+          {/* 환영 메시지 */}
           <p className="text-gray-500 text-sm leading-relaxed mb-8">
             <span className="text-[#34D399] font-bold">{formData.nickname}</span>님의<br />
             매거진이 준비되었습니다.
           </p>
+          {/* 로그인 페이지로 이동 버튼 */}
           <button
             onClick={onLogin}
             className="w-full py-3 bg-[#34D399] text-black font-black text-sm tracking-widest rounded-xl hover:bg-white transition-colors duration-200"
@@ -122,9 +138,10 @@ export default function SignUpPage({ onBack, onLogin }: SignUpPageProps) {
     );
   }
 
+  // ----- 회원가입 폼 화면 -----
   return (
     <div className="min-h-screen bg-[#0d0d0d] flex items-center justify-center p-6">
-      {/* Background grid texture */}
+      {/* 배경 격자 텍스처 (은은하게 표시) */}
       <div
         className="fixed inset-0 opacity-[0.03] pointer-events-none"
         style={{
@@ -134,8 +151,9 @@ export default function SignUpPage({ onBack, onLogin }: SignUpPageProps) {
       />
 
       <div className="relative w-full max-w-lg">
-        {/* Header */}
+        {/* 헤더 */}
         <div className="mb-10">
+          {/* 로고 + SIGN UP 뱃지 */}
           <div className="flex items-center gap-3 mb-6">
             <h1 className="text-2xl font-black italic text-white uppercase tracking-tighter">
               <span className="text-[#34D399]">ME</span>GAZINE
@@ -144,27 +162,35 @@ export default function SignUpPage({ onBack, onLogin }: SignUpPageProps) {
               SIGN UP
             </span>
           </div>
+          {/* 페이지 타이틀 */}
           <h2 className="text-3xl font-black italic text-white uppercase tracking-tighter leading-tight">
             나만의 AI<br />
             <span className="text-gray-600">매거진을 시작하세요</span>
           </h2>
+          {/* 서비스 설명 서브텍스트 */}
           <p className="text-[11px] text-gray-600 italic mt-3">● 벡터DB 기반 실시간 AI 매거진 플랫폼</p>
         </div>
 
-        {/* Form Card */}
+        {/* 폼 카드 */}
         <div className="bg-[#161616] border border-[#2a2a2a] rounded-2xl p-8 shadow-2xl">
+          {/* 입력 필드 목록 */}
           <div className="space-y-5">
             {fields.map((field) => {
+              // 현재 필드가 포커스 중인지
               const isFocused = focusedField === field.name;
+              // 현재 필드에 에러가 있는지
               const hasError = !!errors[field.name];
+              // 현재 필드에 값이 있는지
               const hasValue = !!formData[field.name];
 
               return (
                 <div key={field.name} className="group">
+                  {/* 필드 레이블 + 태그 뱃지 */}
                   <div className="flex items-center justify-between mb-2">
                     <label className="text-[11px] font-black tracking-widest text-gray-500 uppercase">
                       {field.label}
                     </label>
+                    {/* 포커스 시 뱃지 색상 변경 */}
                     <span
                       className={`text-[9px] px-2 py-0.5 rounded font-black tracking-widest transition-colors duration-200 ${isFocused
                         ? 'bg-[#34D399]/20 text-[#34D399]'
@@ -175,6 +201,7 @@ export default function SignUpPage({ onBack, onLogin }: SignUpPageProps) {
                     </span>
                   </div>
 
+                  {/* 입력창 + 포커스 좌측 액센트 바 */}
                   <div className="relative">
                     <input
                       type={field.type}
@@ -195,12 +222,12 @@ export default function SignUpPage({ onBack, onLogin }: SignUpPageProps) {
                               : 'border-[#222] hover:border-[#2a2a2a]'
                         }`}
                     />
-                    {/* Active left border accent */}
+                    {/* 포커스 시 좌측에 나타나는 초록 액센트 바 */}
                     {isFocused && !hasError && (
                       <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-6 bg-[#34D399] rounded-full" />
                     )}
                   </div>
-
+                  {/* 에러 메시지 */}
                   {hasError && (
                     <p className="text-[10px] text-red-400 mt-1.5 font-bold tracking-wide">
                       ✕ {errors[field.name]}
@@ -210,15 +237,13 @@ export default function SignUpPage({ onBack, onLogin }: SignUpPageProps) {
               );
             })}
           </div>
-
-          {/* Divider */}
+          {/* 구분선 */}
           <div className="flex items-center gap-4 my-8">
             <div className="flex-1 h-px bg-[#222]" />
             <span className="text-[9px] text-gray-700 font-black tracking-widest">READY</span>
             <div className="flex-1 h-px bg-[#222]" />
           </div>
-
-          {/* Submit Button */}
+          {/* 제출 버튼 */}
           <button
             onClick={handleSubmit}
             className="w-full py-4 bg-[#34D399] text-black font-black text-sm tracking-widest rounded-xl hover:bg-white active:scale-[0.98] transition-all duration-150 uppercase relative overflow-hidden group"
@@ -230,7 +255,7 @@ export default function SignUpPage({ onBack, onLogin }: SignUpPageProps) {
             </span>
           </button>
 
-          {/* Footer link */}
+          {/* 풋터 링크 — onBack으로 이전 화면으로 이동 */}
           <p className="text-center text-[11px] text-gray-600 mt-6 italic">
             이미 계정이 있으신가요?{' '}
             <button onClick={onLogin} className="text-[#34D399] font-bold hover:text-white transition-colors duration-150 not-italic">
@@ -238,7 +263,7 @@ export default function SignUpPage({ onBack, onLogin }: SignUpPageProps) {
             </button>
           </p>
         </div>
-        {/* Bottom tag */}
+        {/* 하단 설명 */}
         <p className="text-center text-[10px] text-gray-700 italic mt-6">
           ● AI-powered news magazine platform
         </p>
