@@ -12,3 +12,6 @@ npm-debug.log*
 # OS 설정 파일
 .DS_Store
 Thumbs.db
+
+# package
+package-lock.json
