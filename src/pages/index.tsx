@@ -45,6 +45,13 @@ export default function MainPage() {
   const [showSignUp, setShowSignUp] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
 
+  const handleLogoClick = () => {
+    setShowSignUp(false);
+    setShowLogin(false);
+    setSelectedNews(null);
+    setIsModalOpen(false);
+  };
+
   const handleAddTag = (newTag: string) => {
     if (!allTags.includes(newTag)) {
       setAllTags(prev => [...prev, newTag]); // 리스트에 추가
@@ -62,18 +69,21 @@ export default function MainPage() {
   };
 
   if (showLogin) {
-    return <Login onBack={() => setShowLogin(false)} onSignUp={() => { setShowLogin(false); setShowSignUp(true); }} />;
+    return <Login onBack={() => setShowLogin(false)} onLogoClick={handleLogoClick} onSignUp={() => { setShowLogin(false); setShowSignUp(true); }} />;
   }
 
   if (showSignUp) {
-    return <SignUp onBack={() => setShowSignUp(false)} onLogin={() => { setShowSignUp(false); setShowLogin(true); }} />;
+    return <SignUp onBack={() => setShowSignUp(false)} onLogoClick={handleLogoClick} onLogin={() => { setShowSignUp(false); setShowLogin(true); }} />;
   }
   return (
 
     <div className="min-h-screen bg-background p-6 lg:p-10">
       <div className="max-w-5xl mx-auto">
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
-          <h1 className="text-2xl font-black italic text-white uppercase tracking-tighter">
+          <h1 
+            onClick={handleLogoClick}
+            className="text-2xl font-black italic text-white uppercase tracking-tighter cursor-pointer hover:opacity-80 transition-opacity"
+          >
             <span className="text-accent">ME</span>GAZINE
           </h1>
           <div className="flex items-center gap-4">

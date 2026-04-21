@@ -13,9 +13,10 @@ interface FormErrors {
 interface LoginPageProps {
   onBack?: () => void;
   onSignUp?: () => void;
+  onLogoClick?: () => void;
 }
 
-export default function LoginPage({ onBack, onSignUp }: LoginPageProps) {
+export default function LoginPage({ onBack, onSignUp, onLogoClick }: LoginPageProps) {
   const [formData, setFormData] = useState<FormData>({
     username: '',
     password: '',
@@ -79,9 +80,12 @@ export default function LoginPage({ onBack, onSignUp }: LoginPageProps) {
         {/* Header */}
         <div className="mb-10">
           <div className="flex items-center gap-3 mb-6">
-            <h1 className="text-2xl font-black italic text-white uppercase tracking-tighter">
-              <span className="text-[#34D399]">ME</span>GAZINE
-            </h1>
+            <h1 
+            onClick={onLogoClick}
+            className="text-2xl font-black italic text-white uppercase tracking-tighter cursor-pointer hover:opacity-80"
+          >
+            <span className="text-[#34D399]">ME</span>GAZINE
+          </h1>
             <span className="bg-[#34D399]/10 border border-[#34D399]/20 text-[#34D399] text-[9px] px-2 py-1 rounded font-bold tracking-widest">
               LOG IN
             </span>
