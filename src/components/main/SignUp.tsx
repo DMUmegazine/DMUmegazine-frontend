@@ -20,11 +20,12 @@ interface FormErrors {
 interface SignUpPageProps {
   onBack?: () => void;
   onLogin?: () => void;
+  onLogoClick?: () => void;
 }
 
 
 
-export default function SignUpPage({ onBack, onLogin }: SignUpPageProps) {
+export default function SignUpPage({ onBack, onLogin, onLogoClick}: SignUpPageProps) {
   const [formData, setFormData] = useState<FormData>({
     email: '',
     username: '',
@@ -104,9 +105,9 @@ export default function SignUpPage({ onBack, onLogin }: SignUpPageProps) {
           <div className="inline-block bg-[#34D399]/10 border border-[#34D399]/30 rounded-2xl px-4 py-1 mb-6">
             <span className="text-[#34D399] text-xs font-black tracking-widest">● COMPLETE</span>
           </div>
-          <h2 className="text-4xl font-black italic text-white uppercase tracking-tighter mb-4">
-            MEGA<span className="text-[#34D399]">ZINE</span>
-          </h2>
+          <h2 onClick={onLogoClick} className="text-4xl font-black italic text-white uppercase tracking-tighter mb-4 cursor-pointer">
+      <span className="text-[#34D399]">ME</span>GAZINE
+    </h2>
           <p className="text-gray-500 text-sm leading-relaxed mb-8">
             <span className="text-[#34D399] font-bold">{formData.nickname}</span>님의<br />
             매거진이 준비되었습니다.
@@ -137,9 +138,9 @@ export default function SignUpPage({ onBack, onLogin }: SignUpPageProps) {
         {/* Header */}
         <div className="mb-10">
           <div className="flex items-center gap-3 mb-6">
-            <h1 className="text-2xl font-black italic text-white uppercase tracking-tighter">
-              <span className="text-[#34D399]">ME</span>GAZINE
-            </h1>
+            <h1 onClick={onLogoClick} className="text-2xl font-black italic text-white uppercase tracking-tighter cursor-pointer hover:opacity-80">
+      <span className="text-[#34D399]">ME</span>GAZINE
+    </h1>
             <span className="bg-[#34D399]/10 border border-[#34D399]/20 text-[#34D399] text-[9px] px-2 py-1 rounded font-black tracking-widest">
               SIGN UP
             </span>
