@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 // 회원가입 폼 입력 데이터 구조
 interface FormData {
   email: string;
-  username: string;
   nickname: string;
   password: string;
   confirmPassword: string;
@@ -30,7 +29,6 @@ interface SignUpPageProps {
 export default function SignUpPage({ onBack, onLogin, onLogoClick}: SignUpPageProps) {
   const [formData, setFormData] = useState<FormData>({
     email: '',
-    username: '',
     nickname: '',
     password: '',
     confirmPassword: '',
@@ -50,11 +48,6 @@ export default function SignUpPage({ onBack, onLogin, onLogoClick}: SignUpPagePr
       newErrors.email = '이메일을 입력해주세요.';
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = '올바른 이메일 형식이 아닙니다.';
-    }
-    if (!formData.username) {
-      newErrors.username = '아이디를 입력해주세요.';
-    } else if (formData.username.length < 4) {
-      newErrors.username = '아이디는 4자 이상이어야 합니다.';
     }
     if (!formData.nickname) {
       newErrors.nickname = '닉네임을 입력해주세요.';
@@ -83,15 +76,34 @@ export default function SignUpPage({ onBack, onLogin, onLogoClick}: SignUpPagePr
   };
 
   // 제출 버튼 클릭 시 유효성 검사 후 통과하면 완료 상태로 전환
-  const handleSubmit = (e: React.MouseEvent) => {
-    e.preventDefault();
-    const validationErrors = validate();
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      return;
+const handleSubmit = async (e: React.MouseEvent) => {
+  e.preventDefault();
+  const validationErrors = validate();
+  if (Object.keys(validationErrors).length > 0) {
+    setErrors(validationErrors);
+    return;
+  }
+ try {
+    const response = await fetch('http://localhost:8000/auth/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: formData.email,
+        password: formData.password,
+        nickname: formData.nickname,
+      }),
+    });
+
+    if (response.ok) {
+      setSubmitted(true); // 성공 화면 전환 (기존 로직 유지)
+    } else {
+      const errorData = await response.json();
+      alert(errorData.detail || "회원가입 실패");
     }
-    setSubmitted(true);
-  };
+  } catch (error) {
+    alert("서버 연결 실패");
+  }
+};
 
   // ----- 입력 필드 목록 -----
   // 렌더링할 폼 필드 정보 배열
@@ -103,7 +115,6 @@ export default function SignUpPage({ onBack, onLogin, onLogoClick}: SignUpPagePr
     tag: string;
   }[] = [
       { name: 'email', label: '이메일', type: 'email', placeholder: 'hello@megazine.io', tag: 'ID' },
-      { name: 'username', label: '아이디', type: 'text', placeholder: 'megazine_user', tag: 'USER' },
       { name: 'nickname', label: '닉네임', type: 'text', placeholder: '나의 매거진 이름', tag: 'NICK' },
       { name: 'password', label: '비밀번호', type: 'password', placeholder: '8자 이상 입력', tag: 'PW' },
       { name: 'confirmPassword', label: '비밀번호 확인', type: 'password', placeholder: '한 번 더 입력', tag: 'CFM' },

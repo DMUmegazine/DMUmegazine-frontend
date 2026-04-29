@@ -44,6 +44,27 @@ export default function MainPage() {
   const [selectedNews, setSelectedNews] = useState<NewsArticle | null>(null);
   const [showSignUp, setShowSignUp] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userInfo, setUserInfo] = useState<{ nickname: string; email: string } | null>(null);
+
+  const handleLoginSuccess = (userData: any) => {
+  setIsLoggedIn(true);
+  setUserInfo({
+    nickname: userData.user.nickname,
+    email: userData.user.email
+  });
+
+  if (userData.user.tags && userData.user.tags.length > 0) {
+    setSelectedTags(userData.user.tags);
+
+    setAllTags(prev => {
+      const combined = Array.from(new Set([...prev, ...userData.user.tags]));
+      return combined;
+    });
+  }
+  
+  setShowLogin(false);
+};
 
   const handleLogoClick = () => {
     setShowSignUp(false);
@@ -52,15 +73,30 @@ export default function MainPage() {
     setIsModalOpen(false);
   };
 
-  const handleAddTag = (newTag: string) => {
-    if (!allTags.includes(newTag)) {
-      setAllTags(prev => [...prev, newTag]); // 리스트에 추가
+  const handleAddTag = async (newTag: string) => {
+  const updatedAllTags = allTags.includes(newTag) ? allTags : [...allTags, newTag];
+  const updatedSelectedTags = selectedTags.includes(newTag) ? selectedTags : [...selectedTags, newTag];
+  
+  setAllTags(updatedAllTags);
+  setSelectedTags(updatedSelectedTags);
+
+  if (isLoggedIn && userInfo?.email) {
+    try {
+      await fetch('http://localhost:8000/auth/update-tags', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: userInfo.email,
+          tags: updatedSelectedTags, // 현재 선택된 모든 태그 전송
+        }),
+      });
+      console.log("관심사가 DB에 저장되었습니다.");
+    } catch (error) {
+      console.error("태그 저장 실패:", error);
     }
-    if (!selectedTags.includes(newTag)) {
-      setSelectedTags(prev => [...prev, newTag]); // 즉시 선택 상태로 변경
-    }
-    setIsModalOpen(false); // 모달 닫기
-  };
+  }
+  setIsModalOpen(false);
+};
 
   const toggleTag = (tag: string) => {
     setSelectedTags(prev =>
@@ -68,13 +104,22 @@ export default function MainPage() {
     );
   };
 
-  if (showLogin) {
-    return <Login onBack={() => setShowLogin(false)} onLogoClick={handleLogoClick} onSignUp={() => { setShowLogin(false); setShowSignUp(true); }} />;
-  }
-
-  if (showSignUp) {
-    return <SignUp onBack={() => setShowSignUp(false)} onLogoClick={handleLogoClick} onLogin={() => { setShowSignUp(false); setShowLogin(true); }} />;
-  }
+  if (showSignUp) return (
+    <SignUp 
+      onBack={() => setShowSignUp(false)} 
+      onLogin={() => { setShowSignUp(false); setShowLogin(true); }} 
+      onLogoClick={handleLogoClick} 
+    />
+  );
+  
+  if (showLogin) return (
+    <Login 
+      onBack={() => setShowLogin(false)} 
+      onSignUp={() => { setShowLogin(false); setShowSignUp(true); }} // 회원가입으로 이동
+      onLogoClick={handleLogoClick}
+      onLoginSuccess={handleLoginSuccess} // 성공 콜백 전달
+    />
+  );
   return (
 
     <div className="min-h-screen bg-background p-6 lg:p-10">
@@ -94,12 +139,27 @@ export default function MainPage() {
               onAddClick={() => setIsModalOpen(true)}
             />
             {/* 회원가입 버튼 */}
-            <button
-              onClick={() => setShowSignUp(true)}
-              className="bg-[#34D399] text-black text-xs font-bold tracking-widest px-4 py-2 rounded-xl hover:bg-white transition-colors duration-150 uppercase"
-            >
-              회원가입
-            </button>
+            {isLoggedIn ? (
+              <div className="flex flex-col items-end gap-0.5">
+                <span className="text-[10px] text-accent font-black tracking-widest uppercase italic">
+                  ● {userInfo?.nickname} 님
+                </span>
+                <button 
+                  onClick={() => setIsLoggedIn(false)}
+                  className="text-[9px] text-gray-600 hover:text-white font-bold transition-colors"
+                >
+                  LOGOUT
+                </button>
+              </div>
+            ) : (
+              <button 
+                onClick={() => setShowLogin(true)} 
+                className="px-6 py-2.5 bg-[#34D399] text-black font-black text-[11px] tracking-widest rounded-xl hover:bg-white active:scale-[0.98] transition-all duration-150 uppercase relative overflow-hidden group"
+              >
+                <span className="relative z-10">LOG IN</span>
+                <div className="absolute inset-0 bg-white translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ease-out" />
+              </button>
+            )}
           </div>
         </header>
 

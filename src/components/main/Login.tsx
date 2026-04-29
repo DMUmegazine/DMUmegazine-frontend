@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 interface FormData {
-  username: string;
+  email: string;
   password: string;
 }
 
@@ -14,11 +14,12 @@ interface LoginPageProps {
   onBack?: () => void;
   onSignUp?: () => void;
   onLogoClick?: () => void;
+  onLoginSuccess: (userData: any) => void;
 }
 
-export default function LoginPage({ onBack, onSignUp, onLogoClick }: LoginPageProps) {
+export default function LoginPage({ onBack, onSignUp, onLogoClick, onLoginSuccess }: LoginPageProps) {
   const [formData, setFormData] = useState<FormData>({
-    username: '',
+    email: '',
     password: '',
   });
 
@@ -27,7 +28,7 @@ export default function LoginPage({ onBack, onSignUp, onLogoClick }: LoginPagePr
 
   const validate = (): FormErrors => {
     const newErrors: FormErrors = {};
-    if (!formData.username) {
+    if (!formData.email) {
       newErrors.username = '아이디를 입력해주세요.';
     }
     if (!formData.password) {
@@ -44,15 +45,33 @@ export default function LoginPage({ onBack, onSignUp, onLogoClick }: LoginPagePr
     }
   };
 
-  const handleSubmit = (e: React.MouseEvent) => {
+  const handleSubmit = async (e: React.MouseEvent) => {
     e.preventDefault();
     const validationErrors = validate();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;
     }
-    // TODO: 로그인 API 연결
-  };
+    try {
+      const response = await fetch('http://localhost:8000/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+  email: formData.email,
+  password: formData.password,
+}),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        onLoginSuccess(data); // 부모 상태 업데이트
+      } else {
+        alert("이메일 또는 비밀번호가 올바르지 않습니다.");
+      }
+    } catch (error) {
+      alert("서버 연결 실패. 백엔드가 켜져 있는지 확인하세요.");
+    }
+  };  
 
   const fields: {
     name: keyof FormData;
@@ -61,7 +80,7 @@ export default function LoginPage({ onBack, onSignUp, onLogoClick }: LoginPagePr
     placeholder: string;
     tag: string;
   }[] = [
-    { name: 'username', label: '아이디', type: 'text', placeholder: 'megazine_user', tag: 'USER' },
+    { name: 'email', label: '아이디', type: 'text', placeholder: 'megazine_user', tag: 'EMAIL' },
     { name: 'password', label: '비밀번호', type: 'password', placeholder: '비밀번호 입력', tag: 'PW' },
   ];
 
