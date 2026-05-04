@@ -46,6 +46,23 @@ export default function MainPage() {
   const [showLogin, setShowLogin] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userInfo, setUserInfo] = useState<{ nickname: string; email: string } | null>(null);
+  const [articles, setArticles] = useState<NewsArticle[]>([]);
+  
+  const fetchAISearch = async (query: string) => {
+    try {
+      const response = await fetch(`http://localhost:8000/news/search?query=${encodeURIComponent(query)}`);
+      const data = await response.json();
+      
+      // 백엔드 반환 데이터(news_id, distance 등)를 프론트 NewsArticle 형식으로 매칭
+      // 현재는 최소한의 연동이므로 받아온 ID 리스트를 기반으로 UI를 업데이트합니다.
+      console.log("AI 검색 결과(ID 리스트):", data);
+      
+      // 다른 개발자가 DB 매칭을 완료하기 전까지는 콘솔로 확인하거나 
+      // 결과가 있음을 알리는 용도로 사용합니다.
+    } catch (error) {
+      console.error("AI 검색 실패:", error);
+    }
+  };
 
   const handleLoginSuccess = (userData: any) => {
   setIsLoggedIn(true);
@@ -99,9 +116,13 @@ export default function MainPage() {
 };
 
   const toggleTag = (tag: string) => {
-    setSelectedTags(prev =>
-      prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
-    );
+    setSelectedTags(prev => {
+      const nextTags = prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag];
+      if (!prev.includes(tag)) {
+        fetchAISearch(tag); // 태그가 선택될 때 해당 단어로 AI 유사도 검색 실행
+      }
+      return nextTags;
+    });
   };
 
   if (showSignUp) return (
@@ -165,7 +186,7 @@ export default function MainPage() {
 
 
         {/* 2. [DEEP-01] 검색바 (상단 고정) */}
-        <DeepSearchBar onSearch={(k) => console.log(k)} />
+        <DeepSearchBar onSearch={(keyword) => fetchAISearch(keyword)} />
 
         {/* 3. [DEEP-05] 선택된 뉴스 상세 브리핑 (검색바 바로 아래) */}
         {selectedNews && (
