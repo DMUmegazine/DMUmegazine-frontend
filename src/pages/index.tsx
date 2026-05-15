@@ -76,16 +76,21 @@ export default function MainPage() {
   const fetchAISearch = async (query: string) => {
     try {
       const response = await fetch(
-        `http://localhost:8000/news/search?query=${encodeURIComponent(query)}`
+        `http://localhost:8000/magazine/generate?query=${encodeURIComponent(query)}`
       );
       const data = await response.json();
+      
       console.log('AI 검색 결과:', data);
-      // TODO: 백엔드 연동 완료 후 data로 SearchResult 구성
-      setSearchResult(DUMMY_SEARCH_RESULT);
+
+      if (data.error || !data.briefings) {
+        alert(`매거진 생성 실패: ${data.error || '데이터를 불러올 수 없습니다.'}`);
+        return; 
+      }
+
+      setSearchResult(data); 
     } catch (error) {
       console.error('AI 검색 실패:', error);
-      // 백엔드 미연결 상태에서도 UI 확인을 위해 더미 데이터 표시
-      setSearchResult(DUMMY_SEARCH_RESULT);
+      alert('서버와 연결할 수 없습니다.');
     }
   };
 
