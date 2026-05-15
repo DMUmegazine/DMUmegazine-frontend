@@ -40,4 +40,5 @@ export interface SearchResult {
   publishedAt: string;
   briefings: BriefingSection[];
   relatedArticles: NewsArticle[]; // 유사도 랭킹 순 정렬
+  imageUrl?: string;              // LLM 생성 이미지 URL (없으면 스켈레톤)
 }

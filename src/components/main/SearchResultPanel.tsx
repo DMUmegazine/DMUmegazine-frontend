@@ -31,11 +31,15 @@ export default function SearchResultPanel({ result }: Props) {
         </div>
       </div>
 
-      {/* 중앙: 기사 이미지 (스켈레톤) */}
+      {/* 중앙: 기사 이미지 */}
       <div className="bg-card border border-border rounded-2xl overflow-hidden flex flex-col">
-        <div className="flex-1 bg-[#2A2A2A] animate-pulse min-h-[320px]" />
+        {result.imageUrl ? (
+          <img src={result.imageUrl} alt={result.title} className="flex-1 object-cover" />
+        ) : (
+          <div className="flex-1 bg-[#2A2A2A] animate-pulse min-h-[320px]" />
+        )}
         <p className="text-[10px] text-gray-600 text-center py-3 font-bold tracking-wide">
-          이미지 생성 중...
+          {result.imageUrl ? result.title : '이미지 생성 중...'}
         </p>
       </div>
 
