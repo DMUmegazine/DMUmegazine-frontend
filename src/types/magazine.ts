@@ -20,3 +20,24 @@ export interface Source {
   name: string;
   url: string;
 }
+
+/**
+ * LLM이 생성한 브리핑 섹션 (무슨 일이 발생했나? 등)
+ */
+export interface BriefingSection {
+  icon: string;
+  question: string;
+  answer: string;
+}
+
+/**
+ * [DEEP-01] AI 검색 결과 — RAG 유사도 검색 후 LLM이 생성한 종합 브리핑
+ */
+export interface SearchResult {
+  title: string;
+  tag: string;
+  source: string;
+  publishedAt: string;
+  briefings: BriefingSection[];
+  relatedArticles: NewsArticle[]; // 유사도 랭킹 순 정렬
+}
