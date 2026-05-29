@@ -73,10 +73,17 @@ export default function MainPage() {
   const [userInfo, setUserInfo] = useState<{ nickname: string; email: string } | null>(null);
   const [searchResult, setSearchResult] = useState<SearchResult | null>(null);
 
-  const fetchAISearch = async (query: string) => {
+const fetchAISearch = async (query: string) => {
     try {
+      // 💡 핵심 로직: 사용자가 입력한 검색어(query)와 선택된 태그(selectedTags)를 띄어쓰기로 결합
+      // 예: query가 "ai"이고 selectedTags가 ["IT", "경제"]라면 -> "ai IT 경제"로 변환됨
+      const combinedQuery = [query, ...selectedTags].join(' ').trim();
+
+      console.log('최종 검색어:', combinedQuery); // 확인용 로그
+
+      // 결합된 검색어를 인코딩하여 백엔드로 전송
       const response = await fetch(
-        `http://localhost:8000/magazine/generate?query=${encodeURIComponent(query)}`
+        `http://localhost:8000/magazine/generate?query=${encodeURIComponent(combinedQuery)}`
       );
       const data = await response.json();
       
