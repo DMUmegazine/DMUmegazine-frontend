@@ -34,18 +34,16 @@ export default function SearchResultPanel({ result }: Props) {
       <div className="bg-card border border-border rounded-2xl overflow-hidden flex flex-col">
         {result.imageUrl ? (
           <img 
-  src={result.imageUrl || "https://placehold.co/800x800?text=Generating..."} 
-  alt={result.title} 
-  className="flex-1 object-cover min-h-[320px]"
-  onError={(e) => {
-    const target = e.target as HTMLImageElement;
-        target.onerror = null; 
-    
-    target.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8+R8AAnkB9m9zBfIAAAAASUVORK5CYII=";
-    
-    console.warn("이미지 로딩 실패: 무한 루프 방지를 위해 기본 색상으로 대체합니다.");
-  }}
-/>
+            src={result.imageUrl} 
+            alt={result.title} 
+            className="w-full h-full object-cover rounded-xl"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.onerror = null; 
+              target.src = "https://placehold.co/800x800/2A2A2A/34D399?text=Image+Delayed";
+              console.warn("이미지 로딩 지연: 플레이스홀더로 대체합니다.");
+            }}
+          />
         ) : (
           <div className="flex-1 bg-[#2A2A2A] animate-pulse min-h-[320px]" />
         )}
