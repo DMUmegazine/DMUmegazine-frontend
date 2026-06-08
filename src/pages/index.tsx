@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import CategoryNav from '../components/layout/CategoryNav';
 import DeepSearchBar from '../components/main/DeepSearchBar';
 import KeywordModal from '../components/main/KeywordModal';
@@ -6,6 +6,7 @@ import SearchResultPanel from '../components/main/SearchResultPanel';
 import { SearchResult } from '../types/magazine';
 import SignUp from '../components/main/SignUp';
 import Login from '../components/main/Login';
+import LoadingSkeleton from '../components/main/LoadingSkeleton';
 
 const DUMMY_SEARCH_RESULT: SearchResult = {
   title: '애플 WWDC 2025 주요 발표 — AI 통합과 iOS 19의 변화',
@@ -72,9 +73,52 @@ export default function MainPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userInfo, setUserInfo] = useState<{ nickname: string; email: string } | null>(null);
   const [searchResult, setSearchResult] = useState<SearchResult | null>(null);
+  const [isLoading, setIsLoading] = useState(false); 
+
+  // 💡 1. [세션 복구] 화면이 처음 켜질 때 로컬 스토리지에 유저가 있는지 확인
+  useEffect(() => {
+    const savedUser = localStorage.getItem('megazine_user');
+    if (savedUser) {
+      const userData = JSON.parse(savedUser);
+      setIsLoggedIn(true);
+      setUserInfo({
+        nickname: userData.nickname,
+        email: userData.email,
+      });
+      if (userData.tags && userData.tags.length > 0) {
+        setSelectedTags(userData.tags);
+        setAllTags((prev) => Array.from(new Set([...prev, ...userData.tags])));
+      }
+    }
+  }, []);
+
+  // 💡 2. [세션 저장] 로그인 성공 시 로컬 스토리지에 유저 정보 박제
+  const handleLoginSuccess = (userData: any) => {
+    setIsLoggedIn(true);
+    
+    // 저장하기 쉽게 객체로 정리
+    const newUserInfo = {
+      nickname: userData.user.nickname,
+      email: userData.user.email,
+      tags: userData.user.tags || []
+    };
+    
+    setUserInfo(newUserInfo);
+    
+    if (newUserInfo.tags.length > 0) {
+      setSelectedTags(newUserInfo.tags);
+      setAllTags((prev) => Array.from(new Set([...prev, ...newUserInfo.tags])));
+    }
+    setShowLogin(false);
+
+    // 프론트엔드 브라우저 DB(로컬 스토리지)에 문자열로 저장
+    localStorage.setItem('megazine_user', JSON.stringify(newUserInfo));
+  };
 
 const fetchAISearch = async (query: string) => {
     try {
+      setIsLoading(true); 
+      setSearchResult(null); 
       // 💡 핵심 로직: 사용자가 입력한 검색어(query)와 선택된 태그(selectedTags)를 띄어쓰기로 결합
       // 예: query가 "ai"이고 selectedTags가 ["IT", "경제"]라면 -> "ai IT 경제"로 변환됨
       const combinedQuery = [query, ...selectedTags].join(' ').trim();
@@ -98,20 +142,9 @@ const fetchAISearch = async (query: string) => {
     } catch (error) {
       console.error('AI 검색 실패:', error);
       alert('서버와 연결할 수 없습니다.');
+    } finally {
+      setIsLoading(false); // 💡 결과가 오든 에러가 나든 로딩창 끄기
     }
-  };
-
-  const handleLoginSuccess = (userData: any) => {
-    setIsLoggedIn(true);
-    setUserInfo({
-      nickname: userData.user.nickname,
-      email: userData.user.email,
-    });
-    if (userData.user.tags && userData.user.tags.length > 0) {
-      setSelectedTags(userData.user.tags);
-      setAllTags((prev) => Array.from(new Set([...prev, ...userData.user.tags])));
-    }
-    setShowLogin(false);
   };
 
   const handleLogoClick = () => {
@@ -177,7 +210,7 @@ const fetchAISearch = async (query: string) => {
 
   return (
     <div className="min-h-screen bg-background p-6 lg:p-10">
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-[1400px] mx-auto">
         {/* 헤더 */}
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
           <h1
@@ -218,7 +251,7 @@ const fetchAISearch = async (query: string) => {
         </header>
 
         {/* 검색 결과 없음: 검색창 중앙 배치 */}
-        {!searchResult ? (
+        {!searchResult && !isLoading ? (
           <div className="flex flex-col items-center justify-center min-h-[60vh]">
             <div className="w-full">
               <DeepSearchBar onSearch={fetchAISearch} />
@@ -229,7 +262,11 @@ const fetchAISearch = async (query: string) => {
             {/* 검색창 */}
             <DeepSearchBar onSearch={fetchAISearch} />
             {/* 3분할 결과 패널 */}
-            <SearchResultPanel result={searchResult} />
+            {isLoading ? (
+              <LoadingSkeleton />
+            ) : (
+               searchResult && <SearchResultPanel result={searchResult} />
+            )}
           </>
         )}
 
